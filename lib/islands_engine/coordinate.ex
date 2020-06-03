@@ -20,4 +20,8 @@ defmodule IslandsEngine.Coordinate do
       {:error, reason} -> raise(ArgumentError, inspect(reason))
     end
   end
+
+  def offset(%{row: row, col: col}, row_offset, col_offset) do
+    Coordinate.new(row + row_offset, col + col_offset)
+  end
 end
