@@ -36,6 +36,8 @@ defmodule IslandsEngine.Island do
   defp offsets(:square), do: [{0, 0}, {0, 1}, {1, 0}, {1, 1}]
   defp offsets(_), do: {:error, :invalid_island_type}
 
+  def types, do: [:atoll, :dot, :l_shape, :s_shape, :square]
+
   def guess(island, coordinate) do
     case MapSet.member?(island.coordinates, coordinate) do
       true ->
