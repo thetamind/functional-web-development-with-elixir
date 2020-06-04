@@ -32,6 +32,13 @@ defmodule IslandsEngine.IslandTest do
     end
   end
 
+  test "forested?/1" do
+    {:ok, island} = Island.new(:dot, Coordinate.new!(5, 5))
+    refute Island.forested?(island)
+    {:hit, island} = Island.guess(island, Coordinate.new!(5, 5))
+    assert Island.forested?(island)
+  end
+
   test "overlaps?/2" do
     {:ok, square} = Island.new(:square, Coordinate.new!(1, 1))
     {:ok, dot} = Island.new(:dot, Coordinate.new!(1, 2))

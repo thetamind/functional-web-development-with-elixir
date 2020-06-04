@@ -47,6 +47,8 @@ defmodule IslandsEngine.Island do
     end
   end
 
+  def forested?(island), do: MapSet.equal?(island.coordinates, island.hit_coordinates)
+
   def overlaps?(existing_island, new_island) do
     not MapSet.disjoint?(existing_island.coordinates, new_island.coordinates)
   end
