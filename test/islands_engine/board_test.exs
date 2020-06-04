@@ -5,6 +5,38 @@ defmodule IslandsEngine.BoardTest do
   alias IslandsEngine.Coordinate
   alias IslandsEngine.Island
 
+  def island!(type, row, col) do
+    {:ok, island} = Island.new(type, Coordinate.new!(row, col))
+    island
+  end
+
+  describe "guess/2" do
+    test "putting it all together" do
+      square = island!(:square, 1, 1)
+
+      board =
+        Board.new()
+        |> Board.position_island(:square, square)
+
+      dot = island!(:dot, 2, 2)
+      assert {:error, :overlapping_island} = Board.position_island(board, :dot, dot)
+
+      dot = island!(:dot, 3, 3)
+      board = Board.position_island(board, :dot, dot)
+
+      assert {:miss, :none, :no_win, board} = Board.guess(board, Coordinate.new!(10, 10))
+
+      assert {:hit, :none, :no_win, board} = Board.guess(board, Coordinate.new!(1, 1))
+
+      # manually mark square as forested
+      square = %{square | hit_coordinates: square.coordinates}
+      board = Board.position_island(board, :square, square)
+
+      # leaving hitting dot for the win
+      assert {:hit, :dot, :win, _board} = Board.guess(board, Coordinate.new!(3, 3))
+    end
+  end
+
   describe "position_island/3" do
     test "places island on board" do
       {:ok, square} = Island.new(:square, Coordinate.new!(1, 1))
