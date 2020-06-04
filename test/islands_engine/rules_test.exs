@@ -13,4 +13,34 @@ defmodule IslandsEngine.RulesTest do
       assert :error = new() |> check(:no_not_that_one)
     end
   end
+
+  describe "when players_set" do
+    test "players can position_islands" do
+      {:ok, rules} = new() |> check(:add_player)
+      {:ok, rules} = check(rules, {:position_islands, :player1})
+      {:ok, rules} = check(rules, {:position_islands, :player2})
+
+      assert rules.state == :players_set
+    end
+
+    test "a player sets their islands" do
+      {:ok, rules} = new() |> check(:add_player)
+      {:ok, rules} = check(rules, {:position_islands, :player1})
+      {:ok, rules} = check(rules, {:position_islands, :player2})
+      {:ok, rules} = check(rules, {:set_islands, :player2})
+      {:ok, rules} = check(rules, {:set_islands, :player2})
+
+      assert rules.state == :players_set
+    end
+
+    test "both players set their islands transitions to player1_turn" do
+      {:ok, rules} = new() |> check(:add_player)
+      {:ok, rules} = check(rules, {:position_islands, :player1})
+      {:ok, rules} = check(rules, {:position_islands, :player2})
+      {:ok, rules} = check(rules, {:set_islands, :player1})
+      {:ok, rules} = check(rules, {:set_islands, :player2})
+
+      assert rules.state == :player1_turn
+    end
+  end
 end
