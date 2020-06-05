@@ -43,4 +43,25 @@ defmodule IslandsEngine.RulesTest do
       assert rules.state == :player1_turn
     end
   end
+
+  describe "when playerN_turn" do
+    test "guessing transitions to other player's turn" do
+      rules = %{new() | state: :player1_turn}
+      {:ok, rules} = check(rules, {:guess_coordinate, :player1})
+      assert rules.state == :player2_turn
+      {:ok, rules} = check(rules, {:guess_coordinate, :player2})
+      assert rules.state == :player1_turn
+      {:ok, rules} = check(rules, {:guess_coordinate, :player1})
+      assert rules.state == :player2_turn
+    end
+
+    test "player can only guess on their turn" do
+      rules = %{new() | state: :player1_turn}
+
+      assert :error = check(rules, {:guess_coordinate, :player2})
+
+      rules = %{rules | state: :player2_turn}
+      assert :error = check(rules, {:guess_coordinate, :player1})
+    end
+  end
 end
