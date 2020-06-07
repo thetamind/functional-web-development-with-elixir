@@ -5,7 +5,7 @@ defmodule IslandsEngine.GameTest do
   alias IslandsEngine.Rules
 
   setup do
-    game = start_supervised!({Game, "Frank"})
+    {:ok, game} = Game.start_link("Frank")
     %{game: game}
   end
 
@@ -58,5 +58,10 @@ defmodule IslandsEngine.GameTest do
 
     # player 2 win
     assert {:hit, :dot, :win} = Game.guess_coordinate(game, :player2, 1, 1)
+  end
+
+  test "game registry requires unique names" do
+    {:ok, pid} = Game.start_link("Dino")
+    assert {:error, {:already_started, ^pid}} = Game.start_link("Dino")
   end
 end
