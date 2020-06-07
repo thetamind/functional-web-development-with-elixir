@@ -20,4 +20,19 @@ defmodule IslandsEngine.GameTest do
     assert {:error, :invalid_coordinate} = Game.position_island(game, :player1, :l_shape, 10, 10)
     assert {:error, :overlapping_island} = Game.position_island(game, :player1, :dot, 1, 1)
   end
+
+  test "set islands", %{game: game} do
+    :ok = Game.add_player(game, "Pebbles")
+
+    assert {:error, :not_all_islands_positioned} = Game.set_islands(game, :player1)
+
+    # Place all islands
+    Game.position_island(game, :player1, :atoll, 1, 1)
+    Game.position_island(game, :player1, :dot, 1, 4)
+    Game.position_island(game, :player1, :l_shape, 1, 5)
+    Game.position_island(game, :player1, :s_shape, 5, 1)
+    Game.position_island(game, :player1, :square, 5, 5)
+
+    assert {:ok, _board} = Game.set_islands(game, :player1)
+  end
 end
