@@ -10,6 +10,7 @@ defmodule IslandsEngine.Game do
   alias IslandsEngine.Rules
 
   @players [:player1, :player2]
+  @timeout 60 * 60 * 24 * 1000
 
   def start_link(name) when is_binary(name) do
     GenServer.start_link(__MODULE__, name, name: via_tuple(name))
@@ -20,7 +21,7 @@ defmodule IslandsEngine.Game do
   def init(name) do
     player1 = %{name: name, board: Board.new(), guesses: Guesses.new()}
     player2 = %{name: nil, board: Board.new(), guesses: Guesses.new()}
-    {:ok, %{player1: player1, player2: player2, rules: %Rules{}}}
+    {:ok, %{player1: player1, player2: player2, rules: %Rules{}}, @timeout}
   end
 
   def add_player(game, name) when is_binary(name) do
@@ -106,6 +107,10 @@ defmodule IslandsEngine.Game do
     end
   end
 
+  def handle_info(:timeout, state) do
+    {:stop, {:shutdown, :timeout}, state}
+  end
+
   defp player_board(state, player) do
     Map.get(state, player).board
   end
@@ -126,7 +131,7 @@ defmodule IslandsEngine.Game do
   defp update_player2_name(state, name), do: put_in(state.player2.name, name)
   defp update_rules(state, rules), do: %{state | rules: rules}
 
-  defp reply_success(state, reply), do: {:reply, reply, state}
-  defp reply_error(state), do: {:reply, :error, state}
-  defp reply_error(state, reason), do: {:reply, {:error, reason}, state}
+  defp reply_success(state, reply), do: {:reply, reply, state, @timeout}
+  defp reply_error(state), do: {:reply, :error, state, @timeout}
+  defp reply_error(state, reason), do: {:reply, {:error, reason}, state, @timeout}
 end
