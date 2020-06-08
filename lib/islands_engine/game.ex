@@ -49,7 +49,7 @@ defmodule IslandsEngine.Game do
       |> update_rules(rules)
       |> reply_success(:ok)
     else
-      :error -> {:reply, :error, state}
+      :error -> reply_error(state)
     end
   end
 
@@ -65,10 +65,10 @@ defmodule IslandsEngine.Game do
       |> update_rules(rules)
       |> reply_success(:ok)
     else
-      :error -> {:reply, :error, state}
-      {:error, :invalid_coordinate} -> {:reply, {:error, :invalid_coordinate}, state}
-      {:error, :invalid_island_type} -> {:reply, {:error, :invalid_island_type}, state}
-      {:error, :overlapping_island} -> {:reply, {:error, :overlapping_island}, state}
+      :error -> reply_error(state)
+      {:error, :invalid_coordinate} -> reply_error(state, :invalid_coordinate)
+      {:error, :invalid_island_type} -> reply_error(state, :invalid_island_type)
+      {:error, :overlapping_island} -> reply_error(state, :overlapping_island)
     end
   end
 
@@ -81,8 +81,8 @@ defmodule IslandsEngine.Game do
       |> update_rules(rules)
       |> reply_success({:ok, board})
     else
-      :error -> {:reply, :error, state}
-      false -> {:reply, {:error, :not_all_islands_positioned}, state}
+      :error -> reply_error(state)
+      false -> reply_error(state, :not_all_islands_positioned)
     end
   end
 
@@ -101,8 +101,8 @@ defmodule IslandsEngine.Game do
       |> update_rules(rules)
       |> reply_success({hit_or_miss, forested_island, win_status})
     else
-      :error -> {:reply, :error, state}
-      {:error, :invalid_coordinate} -> {:reply, {:error, :invalid_coordinate}, state}
+      :error -> reply_error(state)
+      {:error, :invalid_coordinate} -> reply_error(state, :invalid_coordinate)
     end
   end
 
@@ -125,5 +125,8 @@ defmodule IslandsEngine.Game do
 
   defp update_player2_name(state, name), do: put_in(state.player2.name, name)
   defp update_rules(state, rules), do: %{state | rules: rules}
+
   defp reply_success(state, reply), do: {:reply, reply, state}
+  defp reply_error(state), do: {:reply, :error, state}
+  defp reply_error(state, reason), do: {:reply, {:error, reason}, state}
 end
