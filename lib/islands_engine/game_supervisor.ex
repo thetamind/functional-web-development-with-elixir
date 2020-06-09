@@ -1,24 +1,24 @@
 defmodule IslandsEngine.GameSupervisor do
   @moduledoc false
 
-  use Supervisor
+  use DynamicSupervisor
 
   alias IslandsEngine.Game
 
   def start_link(_options) do
-    Supervisor.start_link(__MODULE__, :ok, name: __MODULE__)
+    DynamicSupervisor.start_link(__MODULE__, :ok, name: __MODULE__)
   end
 
   def init(:ok) do
-    Supervisor.init([Game], strategy: :simple_one_for_one)
+    DynamicSupervisor.init(strategy: :one_for_one)
   end
 
   def start_game(name) do
-    Supervisor.start_child(__MODULE__, [name])
+    DynamicSupervisor.start_child(__MODULE__, {Game, name})
   end
 
   def stop_game(name) do
-    Supervisor.terminate_child(__MODULE__, pid_from_name(name))
+    DynamicSupervisor.terminate_child(__MODULE__, pid_from_name(name))
   end
 
   defp pid_from_name(name) do

@@ -5,7 +5,7 @@ defmodule IslandsEngine.GameTest do
   alias IslandsEngine.Rules
 
   setup do
-    {:ok, game} = Game.start_link("Frank")
+    {:ok, game} = start_supervised({Game, "Frank"})
     %{game: game}
   end
 
